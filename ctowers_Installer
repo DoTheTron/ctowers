@@ -1,0 +1,88 @@
+#!/bin/bash
+
+#main script for ctowers instller
+
+usage(){
+	echo "[COMMANDS]:"
+	printf "install \t--Installs complete package\n"
+	printf "uninstall \t--Uninstalls complete package\n"
+	printf "\n[OPTIONS]:\n"
+	printf -- "-s\t\t--Specificy a program to install/uninstall\n"
+	printf -- "-V\t\t--Installer version\n"
+	exit 1
+}
+
+full_Install(){
+	local op=$1
+	if [ $op -eq 1 ]; then
+		source tools/tool_suite $op		#install all applications
+		source tools/file_setup $op		#move/place any specific files with preferences
+	elif [ $op -eq 0 ]; then
+		source tools/tool_suite $op		#uninstall all applications
+		source tools/file_setup $op		#remove/any placed files and preferences
+	fi
+}
+
+specific_Installer(){
+	local op=$1
+	if [ $op -eq 1 ]; then
+		source tools/tool_suite 2 $install_request 	#call to specific install
+	elif [ $op -eq 0 ]; then
+		source tools/tool_suite 3 $install_request	#call to specific uninstall
+	fi
+}
+
+###############################################################
+
+#Main#
+
+if [ $# -lt 1 ] 	#check for proper arg amount
+	then
+		usage
+fi
+
+while getopts ":sV" OPTION
+	do
+
+	if [ $2 ]; then
+			if [ $2 = "install" ]; then
+				mode=1
+			elif [ $2 = "uninstall" ]; then
+				mode=0
+			else
+				usage
+			fi
+	fi
+
+	case $OPTION in
+		s)
+			install_request=$3
+			specific_Installer $mode $install_request
+			exit 1
+			;;
+		V)
+			cat .version.txt
+			exit 1
+			;;
+		\?)
+			usage
+			;;
+	esac
+
+done
+
+if [ $1 = "install" ]; then
+	mode=1
+	full_Install $mode
+elif [ $1 = "uninstall" ]; then
+	mode=0
+	full_Install $mode
+else
+	usage
+fi
+
+exit 1
+
+#EndMain#
+
+###############################################################

@@ -1,0 +1,95 @@
+#!/bin/bash
+
+#contains all installable applications and option for install/uninstall
+
+mode=$1
+
+case $mode in
+
+	0)
+		#Fulll Uninstallation procedure
+		echo "Full Uninstallation"
+		while read -r curr_uninstall;
+			do
+
+				echo "$curr_uninstall"
+
+				if [ $curr_uninstall  = "simple:" ]; then
+					uninstall_type=$curr_uninstall
+				elif [ $curr_uninstall = "complex:" ]; then
+					uninstall_type=$curr_uninstall
+				elif [ $uninstall_type = "simple:" ]; then
+					sudo apt-get autoremove $curr_uninstall -y
+				elif [ $uninstall_type = "complex:" ]; then
+					echo "Specific procedure"
+				fi
+
+		done < tools/.install_list.txt
+		echo "Full Uninstallation Complete"
+		;;
+
+	1)
+		#Fulll Installation procedure
+		echo "Full Installation"
+		while read -r curr_install;
+			do
+				echo "$curr_install"
+			
+				if [ $curr_install  = "simple:" ]; then
+					install_type=$curr_install
+				elif [ $curr_install = "complex:" ]; then
+					install_type=$curr_install
+				elif [ $install_type = "simple:" ]; then
+					sudo apt-get install $curr_install -y
+				elif [ $install_type = "complex:" ]; then
+					echo "Specific procedure"
+				fi
+
+		done < tools/.install_list.txt
+		echo "Full Installation Complete"
+		;;
+
+	2)
+		#Specific Installation procedure
+		app_For_Install=$2
+		echo "Installing $app_For_Install"
+		while read -r curr_install;
+			do
+				if [ "$curr_install" = "simple:" ]; then
+					install_type=$curr_install
+				elif [ "$curr_install" = "complex:" ]; then
+					install_type=$curr_install
+				elif [ "$install_type" = "simple:" ] && [ "$curr_install" == "$app_For_Install" ]
+					then
+						sudo apt-get install $curr_install -y
+						break
+				elif [ "$install_type" = "complex:" ] && [ "$curr_install" == "$app_For_Install" ]
+					then
+						echo "Specific install"
+				fi
+		done < tools/.install_list.txt
+		echo "Install Complete"
+		;;
+
+	3)
+		#Specific Installation procedure
+		app_For_Install=$2
+		echo "Uninstalling $app_For_Install"
+		while read -r curr_uninstall;
+			do
+				if [ "$curr_uninstall" = "simple:" ]; then
+					install_type=$curr_uninstall
+				elif [ "$curr_uninstall" = "complex:" ]; then
+					install_type=$curr_uninstall
+				elif [ "$install_type" = "simple:" ] && [ "$curr_uninstall" == "$app_For_Install" ]
+					then
+						sudo apt-get autoremove $curr_uninstall -y
+						break
+				elif [ "$install_type" = "complex:" ] && [ "$curr_uninstall" == "$app_For_Install" ]
+					then
+						echo "Specific install"
+				fi
+		done < tools/.install_list.txt
+		echo "Uninstall Complete"
+		;;
+esac
